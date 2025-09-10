@@ -8,7 +8,7 @@ buildscript {
         mavenCentral() // jcenter() 사용 금지
     }
     dependencies {
-        // 루트(앱)와 충돌 없게 AGP 버전 정렬
+        // 루트(앱)과 큰 차이 없게 AGP 버전 정렬
         classpath 'com.android.tools.build:gradle:7.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -25,7 +25,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    // AGP 8 규칙: 네임스페이스는 build.gradle에만 둡니다.
+    // AGP 8 규칙: namespace는 build.gradle에만
     namespace "com.navercorp.flutter_naverlogin"
 
     compileSdkVersion 33
@@ -35,22 +35,19 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Java 11 고정 (자바 컴파일러)
+    // ✅ Java 11로 타깃 고정(설치 JDK는 21이어도 됨)
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
 
-    // Kotlin도 11로 고정
+    // ✅ Kotlin도 11로 타깃 고정
     kotlinOptions {
         jvmTarget = '11'
     }
 
-    // 도구체인도 11로 강제 (환경이 JDK 21이어도 타깃은 11)
-    // 일부 Gradle 버전에서 경고를 막기 위한 보조 설정
-    kotlin {
-        jvmToolchain(11)
-    }
+    // ⚠️ 여기 있었던 jvmToolchain(11) 강제는 제거합니다
+    // kotlin { jvmToolchain(11) }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -62,13 +59,13 @@ android {
 }
 
 dependencies {
-    implementation "com.navercorp.nid:oauth:5.4.0" // Naver OAuth SDK (JDK 11 호환)
+    implementation "com.navercorp.nid:oauth:5.4.0" // Naver OAuth SDK
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.0.1"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.0.1"
 }
 
-// Kotlin 컴파일러에 추가로 jvmTarget 11을 확실히 적용(환경 차이 방지)
+// 선택: 환경 편차 줄이려면 유지해도 OK(툴체인 강제 아님)
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = '11'
